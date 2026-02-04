@@ -245,6 +245,13 @@ end
 local rtp = vim.opt.rtp
 rtp:prepend(lazypath)
 
+-- Check if we in godot to listen to server
+local gdproject = io.open(vim.fn.getcwd() .. '/project.godot', 'r')
+if gdproject then
+  io.close(gdproject)
+  vim.fn.serverstart './godothost'
+end
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
