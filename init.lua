@@ -607,6 +607,14 @@ require('lazy').setup({
         -- ts_ls = {},
       }
 
+      -- GDScript LSP (not managed by Mason, comes with Godot)
+      vim.lsp.config('gdscript', {
+        name = 'godot',
+        cmd = vim.lsp.rpc.connect('127.0.0.1', 6005),
+        root_dir = vim.fs.dirname(vim.fs.find({ 'project.godot' }, { upward = true })[1]),
+      })
+      vim.lsp.enable 'gdscript'
+
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
