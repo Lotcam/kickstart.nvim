@@ -85,6 +85,7 @@ P.S. You can delete this when you're done too. It's your config now! :)
 --]]
 
 vim.o.relativenumber = true
+vim.o.termguicolors = true
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
