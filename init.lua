@@ -625,6 +625,13 @@ require('lazy').setup({
       })
       vim.lsp.enable 'gdscript'
 
+      vim.lsp.config('vala_ls', {
+        cmd = { 'vala-language-server' },
+        filetypes = { 'vala', 'genie' },
+        root_dir = vim.fs.dirname(vim.fs.find({ 'meson.build', '*.vala' }, { upward = true })[1]),
+      })
+      vim.lsp.enable 'vala_ls'
+
       -- Ensure the servers and tools above are installed
       --
       -- To check the current status of installed tools and/or manually install
