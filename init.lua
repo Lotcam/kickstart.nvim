@@ -119,6 +119,15 @@ vim.o.showmode = false
 --  See `:help 'clipboard'`
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
+-- Vala indentation fallback (no treesitter indent queries available)
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'vala',
+  callback = function()
+    vim.bo.indentexpr = ''
+    vim.bo.cindent = true
+  end,
+})
+
 -- Enable break indent
 vim.o.breakindent = true
 
@@ -884,19 +893,6 @@ require('lazy').setup({
     end,
     config = function()
       -- Register Vala parser inside TSUpdate autocmd (official v1 method)
-      vim.api.nvim_create_autocmd('User', {
-        pattern = 'TSUpdate',
-        callback = function()
-          require('nvim-treesitter.parsers').vala = {
-            install_info = {
-              url = 'https://github.com/vala-lang/tree-sitter-vala',
-              files = { 'src/parser.c' },
-              branch = 'main',
-            },
-            filetype = 'vala',
-          }
-        end,
-      })
       local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vala' }
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
