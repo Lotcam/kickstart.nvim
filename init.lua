@@ -876,7 +876,17 @@ require('lazy').setup({
       require('nvim-treesitter').install(filetypes)
     end,
     config = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      -- Registering Vala
+      local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
+      parser_config.vala = {
+        install_info = {
+          url = 'https://github.com/vala-lang/tree-sitter-vala',
+          files = { 'src/parser.c' },
+          branch = 'main',
+        },
+        filetype = 'vala',
+      }
+      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vala' }
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
         callback = function() vim.treesitter.start() end,
