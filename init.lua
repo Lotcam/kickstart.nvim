@@ -125,9 +125,11 @@ vim.api.nvim_create_autocmd('FileType', {
   callback = function()
     vim.bo.indentexpr = ''
     vim.bo.cindent = true
+    vim.bo.expandtab = true -- use spaces instead of tabs
+    vim.bo.shiftwidth = 4
+    vim.bo.tabstop = 4
   end,
 })
-
 -- Enable break indent
 vim.o.breakindent = true
 
