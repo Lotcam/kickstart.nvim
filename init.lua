@@ -87,6 +87,8 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.o.relativenumber = true
 vim.o.termguicolors = true
 
+vim.opt.clipboard = 'unnamedplus'
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -119,15 +121,23 @@ vim.o.showmode = false
 --  See `:help 'clipboard'`
 vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
+vim.bo.expandtab = true -- use spaces instead of tabs
+vim.bo.shiftwidth = 4
+vim.bo.tabstop = 4
+
 -- Vala indentation fallback (no treesitter indent queries available)
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'vala',
   callback = function()
     vim.bo.indentexpr = ''
     vim.bo.cindent = true
-    vim.bo.expandtab = true -- use spaces instead of tabs
-    vim.bo.shiftwidth = 4
-    vim.bo.tabstop = 4
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'gdscript',
+  callback = function()
+    vim.bo.expandtab = false -- use spaces instead of tabs
   end,
 })
 -- Enable break indent
@@ -642,6 +652,13 @@ require('lazy').setup({
         root_dir = vim.fs.dirname(vim.fs.find({ 'meson.build', '*.vala' }, { upward = true })[1]),
       })
       vim.lsp.enable 'vala_ls'
+
+      vim.lsp.config('clangd', {
+        cmd = { 'clangd' },
+        filetypes = { 'c', 'cpp', 'objc', 'objcpp' },
+        root_dir = vim.fs.dirname(vim.fs.find({ 'compile_commands.json', 'compile_flags.txt', '.git' }, { upward = true })[1]),
+      })
+      vim.lsp.enable 'clangd'
 
       -- Ensure the servers and tools above are installed
       --
