@@ -83,6 +83,12 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- Neovim's builtin heuristic for `.v` files guesses Coq vs. Verilog by scanning
+-- for tell-tale syntax. Verilog attributes like `(* keep *)` look Coq-ish and
+-- can win that guess before a `module foo(` line is seen, misdetecting the
+-- filetype as `coq`. Force `.v` to always mean Verilog.
+vim.g.filetype_v = 'verilog'
+
 -- [[ Setting options ]]
 -- See `:help vim.o`
 -- NOTE: You can change these options as you wish!
@@ -117,6 +123,18 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.bo.tabstop = 4
   end,
 })
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'c',
+  callback = function()
+    vim.bo.indentexpr = ''
+    vim.bo.cindent = true
+    vim.bo.expandtab = true -- use spaces instead of tabs
+    vim.bo.shiftwidth = 4
+    vim.bo.tabstop = 4
+  end,
+})
+
 -- Enable break indent
 vim.o.breakindent = true
 
@@ -267,6 +285,7 @@ end
 require('lazy').setup({
   -- NOTE: Plugins can be added via a link or github org/name. To run setup automatically, use `opts = {}`
   { 'NMAC427/guess-indent.nvim', opts = {} },
+  { 'chomosuke/typst-preview.nvim', ft = 'typst', version = '1.*', build = function() require('typst-preview').update() end },
 
   -- Alternatively, use `config = function() ... end` for full control over the configuration.
   -- If you prefer to call `setup` explicitly, use:
@@ -323,6 +342,8 @@ require('lazy').setup({
         { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
         { '<leader>t', group = '[T]oggle' },
         { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+        { '<leader>d', group = '[D]ebug (Godot)' },
+        { '<leader>m', group = '[M]arkdown' },
       },
     },
   },
@@ -877,12 +898,13 @@ require('lazy').setup({
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = function()
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'systemverilog' }
       require('nvim-treesitter').install(filetypes)
     end,
     config = function()
       -- Register Vala parser inside TSUpdate autocmd (official v1 method)
-      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vala' }
+      -- The `systemverilog` parser also covers plain Verilog (filetype `verilog`)
+      local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'vala', 'verilog', 'systemverilog' }
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
         callback = function() vim.treesitter.start() end,
@@ -891,7 +913,22 @@ require('lazy').setup({
   },
 
   -- for godot indenting
-  { 'habamax/vim-godot', event = 'VimEnter' },
+  {
+    'habamax/vim-godot',
+    event = 'VimEnter',
+    config = function() require('custom.godot_debug').setup() end,
+  },
+
+  { -- Live markdown preview in the browser
+    'iamcco/markdown-preview.nvim',
+    cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
+    ft = 'markdown',
+    build = function() vim.fn['mkdp#util#install']() end,
+    init = function() vim.g.mkdp_filetypes = { 'markdown' } end,
+    keys = {
+      { '<leader>mp', '<cmd>MarkdownPreviewToggle<CR>', ft = 'markdown', desc = '[M]arkdown [P]review' },
+    },
+  },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
