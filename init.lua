@@ -919,6 +919,16 @@ require('lazy').setup({
     config = function() require('custom.godot_debug').setup() end,
   },
 
+  { -- LaTeX: syntax, compile (latexmk), view (Skim)
+    'lervag/vimtex',
+    lazy = false, -- vimtex must not be lazy-loaded
+    init = function()
+      vim.g.vimtex_view_method = 'skim'
+      vim.g.vimtex_view_skim_sync = 1 -- forward search to cursor after compile
+      vim.g.vimtex_view_skim_activate = 1
+    end,
+  },
+
   { -- Live markdown preview in the browser
     'iamcco/markdown-preview.nvim',
     cmd = { 'MarkdownPreviewToggle', 'MarkdownPreview', 'MarkdownPreviewStop' },
